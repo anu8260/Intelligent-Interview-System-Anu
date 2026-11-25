@@ -1,0 +1,20 @@
+# Python virtual environment
+venv/
+InterviewAI/venv/
+__pycache__/
+*.pyc
+
+# Environment variables and API keys
+.env
+.env.*
+
+# IDE files
+.vscode/
+
+# Database files
+*.sql
+*.db
+
+# Temporary files
+*.log
+.DS_Store

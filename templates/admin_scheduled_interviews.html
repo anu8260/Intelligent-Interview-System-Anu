@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Slots | Intelligent Interview System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand">
+        <a href="{{ url_for('admin_dashboard') }}">Intelligent Interview System</a>
+    </div>
+
+    <div class="nav-links">
+        <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+        <a href="{{ url_for('admin_students') }}">Students</a>
+        <a href="{{ url_for('admin_jobs') }}">Jobs</a>
+        <a href="{{ url_for('admin_applications') }}">Applications</a>
+        <a href="{{ url_for('admin_interviews') }}" class="active">Interview Slots</a>
+
+        <form method="POST" action="{{ url_for('logout') }}" style="display:inline;">
+            <button type="submit" class="nav-logout">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<main class="page-container">
+
+    <section class="page-header">
+        <div>
+            <p class="eyebrow">ADMIN PANEL</p>
+            <h1>Interview Slot Management</h1>
+            <p>Create interview slots and manage scheduled interviews.</p>
+        </div>
+    </section>
+
+    {% if message %}
+        <div class="alert success">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="alert error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+
+    <!-- CREATE SLOT -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+            <div>
+                <h2>Create Interview Slot</h2>
+                <p>Add a new interview opportunity for students.</p>
+            </div>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('admin_interviews') }}"
+              class="form-grid">
+
+            <div class="form-group">
+                <label for="job_id">Job</label>
+
+                <select id="job_id" name="job_id" required>
+                    <option value="">Select a job</option>
+
+                    {% for job in listings %}
+                        <option value="{{ job.id }}">
+                            {{ job.title }} — {{ job.company }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label for="interview_date">Interview Date</label>
+
+                <input
+                    type="date"
+                    id="interview_date"
+                    name="interview_date"
+                    required
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label for="interview_time">Start Time</label>
+
+                <input
+                    type="time"
+                    id="interview_time"
+                    name="interview_time"
+                    required
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label for="end_time">End Time</label>
+
+                <input
+                    type="time"
+                    id="end_time"
+                    name="end_time"
+                    required
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label for="interview_type">Interview Type</label>
+
+                <select id="interview_type" name="interview_type" required>
+                    <option value="">Select type</option>
+                    <option value="HR Interview">HR Interview</option>
+                    <option value="Technical Interview">Technical Interview</option>
+                    <option value="Communication Round">Communication Round</option>
+                    <option value="Managerial Interview">Managerial Interview</option>
+                    <option value="Final Interview">Final Interview</option>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+                <label for="mode_location">Mode / Location</label>
+
+                <input
+                    type="text"
+                    id="mode_location"
+                    name="mode_location"
+                    placeholder="e.g. Online - Google Meet"
+                    required
+                >
+            </div>
+
+
+            <div class="form-actions">
+                <button type="submit" class="primary-btn">
+                    Create Interview Slot
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- EXISTING SLOTS -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+            <div>
+                <h2>All Interview Slots</h2>
+                <p>View and manage available and scheduled interviews.</p>
+            </div>
+        </div>
+
+
+        {% if slots %}
+
+            <div class="table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+                        <tr>
+                            <th>Job</th>
+                            <th>Student</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Mode / Location</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for slot in slots %}
+
+                            <tr>
+
+                                <td>
+                                    <strong>{{ slot.title or 'Interview' }}</strong>
+
+                                    {% if slot.company %}
+                                        <br>
+                                        <small>{{ slot.company }}</small>
+                                    {% endif %}
+                                </td>
+
+
+                                <td>
+                                    {% if slot.student_name %}
+                                        {{ slot.student_name }}
+
+                                        {% if slot.student_email %}
+                                            <br>
+                                            <small>{{ slot.student_email }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span>Not booked</span>
+                                    {% endif %}
+                                </td>
+
+
+                                <td>
+                                    {{ slot.interview_date|display_date }}
+                                </td>
+
+
+                                <td>
+                                    {{ slot.interview_time|display_time }}
+                                    -
+                                    {{ slot.end_time|display_time }}
+                                </td>
+
+
+                                <td>
+                                    {{ slot.interview_type }}
+                                </td>
+
+
+                                <td>
+                                    {{ slot.mode_location or 'Not specified' }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if slot.status == 'Available' %}
+
+                                        <span class="status-badge status-available">
+                                            Available
+                                        </span>
+
+                                    {% elif slot.status == 'Scheduled' %}
+
+                                        <span class="status-badge status-scheduled">
+                                            Scheduled
+                                        </span>
+
+                                    {% elif slot.status == 'Completed' %}
+
+                                        <span class="status-badge status-completed">
+                                            Completed
+                                        </span>
+
+                                    {% elif slot.status == 'Cancelled' %}
+
+                                        <span class="status-badge status-cancelled">
+                                            Cancelled
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-badge">
+                                            {{ slot.status }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('admin_interview_status', slot_id=slot.id) }}"
+                                    >
+
+                                        <select
+                                            name="status"
+                                            onchange="this.form.submit()"
+                                        >
+
+                                            <option value="Available"
+                                                {% if slot.status == 'Available' %}selected{% endif %}>
+                                                Available
+                                            </option>
+
+                                            <option value="Scheduled"
+                                                {% if slot.status == 'Scheduled' %}selected{% endif %}>
+                                                Scheduled
+                                            </option>
+
+                                            <option value="Completed"
+                                                {% if slot.status == 'Completed' %}selected{% endif %}>
+                                                Completed
+                                            </option>
+
+                                            <option value="Cancelled"
+                                                {% if slot.status == 'Cancelled' %}selected{% endif %}>
+                                                Cancelled
+                                            </option>
+
+                                        </select>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                <h3>No interview slots yet</h3>
+                <p>Create your first interview slot using the form above.</p>
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<script>
+    // Prevent selecting a past date.
+    const dateInput = document.getElementById("interview_date");
+
+    if (dateInput) {
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        dateInput.min = `${year}-${month}-${day}`;
+    }
+</script>
+
+</body>
+</html>

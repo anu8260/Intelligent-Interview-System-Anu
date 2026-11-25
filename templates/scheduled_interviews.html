@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Scheduled Interviews | Intelligent Interview System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<main class="site-shell">
+
+    <!-- ================= NAVIGATION ================= -->
+
+    <nav class="topbar">
+
+        <a class="brand" href="{{ url_for('home') }}">
+            <span class="brand-mark">AI</span>
+            Intelligent Interview System
+        </a>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('trainer') }}">
+                Trainer
+            </a>
+
+            <a href="{{ url_for('jobs') }}">
+                Jobs
+            </a>
+
+            <a href="/applications">
+                My Applications
+            </a>
+
+            <form class="inline-form"
+                  action="{{ url_for('logout') }}"
+                  method="POST">
+
+                <button class="button-danger"
+                        type="submit">
+                    Logout
+                </button>
+
+            </form>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <header class="page-header">
+
+        <p class="eyebrow">
+            INTERVIEW SCHEDULING
+        </p>
+
+        <h1>
+            Scheduled Interviews
+        </h1>
+
+        <p class="lead">
+            Find an interview opportunity, reserve your preferred slot,
+            and manage your scheduled interviews from one place.
+        </p>
+
+    </header>
+
+
+    <!-- ================= NOTIFICATIONS ================= -->
+
+    {% if error %}
+
+        <p class="notice">
+            {{ error }}
+        </p>
+
+    {% endif %}
+
+
+    {% if message %}
+
+        <p class="notice success">
+            {{ message }}
+        </p>
+
+    {% endif %}
+
+
+
+    <!-- ================================================= -->
+    <!-- AVAILABLE INTERVIEW SLOTS -->
+    <!-- ================================================= -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    AVAILABLE OPPORTUNITIES
+                </p>
+
+                <h2>
+                    Available Interview Slots
+                </h2>
+
+                <p class="muted">
+                    Choose an available slot that works for you.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if slots %}
+
+            <div class="history-list">
+
+                {% for slot in slots %}
+
+                    <article class="history-item">
+
+                        <div>
+
+                            <h3>
+
+                                {{ slot.title or 'General Interview' }}
+
+                                {% if slot.company %}
+
+                                    <span>
+                                        · {{ slot.company }}
+                                    </span>
+
+                                {% endif %}
+
+                            </h3>
+
+
+                            <p class="muted">
+
+                                📅 {{ slot.interview_date|display_date }}
+
+                                &nbsp; · &nbsp;
+
+                                🕐 {{ slot.interview_time|display_time }}
+
+                                –
+
+                                {{ slot.end_time|display_time }}
+
+                            </p>
+
+
+                            <p class="muted">
+
+                                💼 {{ slot.interview_type|title }}
+
+                                &nbsp; · &nbsp;
+
+                                📍 {{ slot.mode_location or 'Mode/location to be confirmed' }}
+
+                            </p>
+
+
+                            <p>
+
+                                <span class="status-pill">
+                                    Available
+                                </span>
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="history-actions">
+
+                            <form
+                                action="{{ url_for('book_slot', slot_id=slot.id) }}"
+                                method="POST"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="button"
+                                >
+                                    Schedule Interview
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h3>
+                    No interview slots available
+                </h3>
+
+                <p>
+                    There are currently no available interview slots.
+                    Please check again later.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ================================================= -->
+    <!-- MY SCHEDULED INTERVIEWS -->
+    <!-- ================================================= -->
+
+    <section class="glass-card"
+             style="margin-top: 24px;">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    YOUR SCHEDULE
+                </p>
+
+                <h2>
+                    My Scheduled Interviews
+                </h2>
+
+                <p class="muted">
+                    View and manage interviews you have already scheduled.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if scheduled %}
+
+            <div class="history-list">
+
+                {% for slot in scheduled %}
+
+                    <article class="history-item">
+
+                        <div>
+
+                            <h3>
+
+                                {{ slot.title or 'General Interview' }}
+
+                                {% if slot.company %}
+
+                                    <span>
+                                        · {{ slot.company }}
+                                    </span>
+
+                                {% endif %}
+
+                            </h3>
+
+
+                            <p class="muted">
+
+                                📅 {{ slot.interview_date|display_date }}
+
+                                &nbsp; · &nbsp;
+
+                                🕐 {{ slot.interview_time|display_time }}
+
+                                –
+
+                                {{ slot.end_time|display_time }}
+
+                            </p>
+
+
+                            <p class="muted">
+
+                                💼 {{ slot.interview_type|title }}
+
+                                &nbsp; · &nbsp;
+
+                                📍 {{ slot.mode_location or 'Mode/location to be confirmed' }}
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="history-actions">
+
+                            <span class="status-pill">
+
+                                {{ slot.status|title }}
+
+                            </span>
+
+
+                            {% if slot.status == 'Scheduled' %}
+
+                                <form
+                                    action="{{ url_for('cancel_slot', slot_id=slot.id) }}"
+                                    method="POST"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="button-secondary"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h3>
+                    No interviews scheduled yet
+                </h3>
+
+                <p>
+                    Once you book an interview slot, it will appear here.
+                </p>
+
+                <a
+                    class="button"
+                    href="{{ url_for('jobs') }}"
+                >
+                    Browse Jobs
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- ================================================= -->
+    <!-- QUICK NAVIGATION -->
+    <!-- ================================================= -->
+
+    <section class="glass-card"
+             style="margin-top: 24px;">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    QUICK ACTIONS
+                </p>
+
+                <h2>
+                    Continue Your Preparation
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="action-grid">
+
+            <a
+                href="{{ url_for('trainer') }}"
+                class="action-card"
+            >
+
+                <h3>
+                    🎯 Practice with AI
+                </h3>
+
+                <p>
+                    Improve your interview performance with AI-powered
+                    mock interviews.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('jobs') }}"
+                class="action-card"
+            >
+
+                <h3>
+                    💼 Explore Jobs
+                </h3>
+
+                <p>
+                    Browse available job opportunities and apply for
+                    suitable positions.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="action-card"
+            >
+
+                <h3>
+                    📊 View Progress
+                </h3>
+
+                <p>
+                    Check your interview scores, history and improvement
+                    progress.
+                </p>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+</body>
+</html>

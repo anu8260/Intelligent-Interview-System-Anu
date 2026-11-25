@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Intelligent Interview System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<main class="site-shell">
+
+    <!-- ================= NAVIGATION ================= -->
+
+    <nav class="topbar">
+
+        <a class="brand" href="{{ url_for('home') }}">
+            <span class="brand-mark">AI</span>
+            Intelligent Interview System
+        </a>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('trainer') }}">
+                Trainer
+            </a>
+
+            <a href="{{ url_for('jobs') }}">
+                Jobs
+            </a>
+
+            <!-- NEW: SCHEDULE INTERVIEW -->
+
+            <a href="/scheduled-interviews">
+                Schedule Interview
+            </a>
+
+            <form
+                class="inline-form"
+                action="{{ url_for('logout') }}"
+                method="POST"
+            >
+
+                <button
+                    class="button-danger"
+                    type="submit"
+                >
+                    Logout
+                </button>
+
+            </form>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <header class="page-header">
+
+        <p class="eyebrow">
+            PERFORMANCE OVERVIEW
+        </p>
+
+        <h1>
+            Student Dashboard
+        </h1>
+
+        <p class="lead">
+
+            Welcome,
+
+            <strong>
+                {{ user.name }}
+            </strong>
+
+            <span>
+                &nbsp; {{ user.email }}
+            </span>
+
+        </p>
+
+    </header>
+
+
+    <!-- ================= STATISTICS ================= -->
+
+    <section class="stats-grid">
+
+        <!-- Total Interviews -->
+
+        <article class="stat-card">
+
+            <div class="stat-value">
+                {{ data.statistics.total_interviews or 0 }}
+            </div>
+
+            <div class="stat-label">
+                Interviews completed
+            </div>
+
+        </article>
+
+
+        <!-- Average Score -->
+
+        <article class="stat-card">
+
+            <div class="stat-value">
+
+                {% if data.statistics.average_score is not none %}
+                    {{ "%.2f"|format(data.statistics.average_score|float) }}
+                {% else %}
+                    0.00
+                {% endif %}
+
+            </div>
+
+            <div class="stat-label">
+                Average interview score / 10
+            </div>
+
+        </article>
+
+
+        <!-- Best Score -->
+
+        <article class="stat-card">
+
+            <div class="stat-value">
+
+                {% if data.statistics.best_score is not none %}
+                    {{ "%.2f"|format(data.statistics.best_score|float) }}
+                {% else %}
+                    0.00
+                {% endif %}
+
+            </div>
+
+            <div class="stat-label">
+                Best interview score / 10
+            </div>
+
+        </article>
+
+
+        <!-- Questions Answered -->
+
+        <article class="stat-card">
+
+            <div class="stat-value">
+                {{ data.statistics.total_questions or 0 }}
+            </div>
+
+            <div class="stat-label">
+                Questions answered
+            </div>
+
+        </article>
+
+
+        <!-- Practice Sessions -->
+
+        <article class="stat-card">
+
+            <div class="stat-value">
+                {{ data.statistics.total_interviews or 0 }}
+            </div>
+
+            <div class="stat-label">
+                Practice sessions
+            </div>
+
+        </article>
+
+
+        <!-- Progress -->
+
+        <article class="stat-card">
+
+            <div class="stat-value">
+
+                {% if data.statistics.average_score is not none %}
+                    {{ "%.0f"|format((data.statistics.average_score|float) * 10) }}%
+                {% else %}
+                    0%
+                {% endif %}
+
+            </div>
+
+            <div class="stat-label">
+                Average-score progress
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- ================= PRACTICE PROGRESS ================= -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    YOUR PROGRESS
+                </p>
+
+                <h2>
+                    Practice Progress
+                </h2>
+
+                <p class="muted">
+                    Based on your average interview score.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="progress-wrapper">
+
+            <div class="progress-label">
+
+                <span>
+                    Interview performance
+                </span>
+
+                <strong>
+
+                    {% if data.statistics.average_score is not none %}
+                        {{ "%.0f"|format((data.statistics.average_score|float) * 10) }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="progress-bar">
+
+                <div
+                    class="progress-fill"
+                    style="width:
+                    {% if data.statistics.average_score is not none %}
+                        {{ (data.statistics.average_score|float) * 10 }}%
+                    {% else %}
+                        0%
+                    {% endif %};"
+                >
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= QUICK ACTIONS ================= -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    QUICK ACTIONS
+                </p>
+
+                <h2>
+                    Continue Your Journey
+                </h2>
+
+                <p class="muted">
+                    Practice, apply and prepare for your next opportunity.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="action-grid">
+
+
+            <!-- AI TRAINER -->
+
+            <a
+                href="{{ url_for('trainer') }}"
+                class="action-card"
+            >
+
+                <h3>
+                    🎯 Practice with AI
+                </h3>
+
+                <p>
+                    Start a new AI-powered mock interview and improve
+                    your interview skills.
+                </p>
+
+            </a>
+
+
+            <!-- JOBS -->
+
+            <a
+                href="{{ url_for('jobs') }}"
+                class="action-card"
+            >
+
+                <h3>
+                    💼 Explore Jobs
+                </h3>
+
+                <p>
+                    Discover suitable job opportunities and submit
+                    applications.
+                </p>
+
+            </a>
+
+
+            <!-- SCHEDULE INTERVIEW -->
+
+            <a
+                href="/scheduled-interviews"
+                class="action-card"
+            >
+
+                <h3>
+                    📅 Schedule Interview
+                </h3>
+
+                <p>
+                    View available interview slots and schedule your
+                    upcoming interview.
+                </p>
+
+            </a>
+
+
+            <!-- APPLICATIONS -->
+
+            <a
+                href="/applications"
+                class="action-card"
+            >
+
+                <h3>
+                    📋 My Applications
+                </h3>
+
+                <p>
+                    Track the jobs you have applied for and check
+                    application status.
+                </p>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RECENT INTERVIEWS ================= -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    INTERVIEW HISTORY
+                </p>
+
+                <h2>
+                    Recent Interviews
+                </h2>
+
+                <p class="muted">
+                    Review your latest AI interview sessions.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if data.recent_attempts %}
+
+            <div class="history-list">
+
+                {% for attempt in data.recent_attempts %}
+
+                    <article class="history-item">
+
+                        <div>
+
+                            <h3>
+                                {{ attempt.job_role }}
+                            </h3>
+
+
+                            <p class="muted">
+
+                                {{ attempt.interview_type }}
+
+                                &nbsp; · &nbsp;
+
+                                {{ attempt.difficulty }}
+
+                            </p>
+
+
+                            <p class="muted">
+
+                                {{ attempt.created_at|display_date }}
+
+                            </p>
+
+                        </div>
+
+
+                        <div class="history-actions">
+
+                            <span class="status-pill">
+
+                                {{ "%.2f"|format(attempt.average_score|float) }}/10
+
+                            </span>
+
+
+                            <a
+                                class="button-secondary"
+                                href="{{ url_for('saved_results', attempt_id=attempt.id) }}"
+                            >
+                                View Results
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h3>
+                    No interviews yet
+                </h3>
+
+                <p>
+                    Start your first AI mock interview to begin
+                    building your performance history.
+                </p>
+
+
+                <a
+                    class="button"
+                    href="{{ url_for('trainer') }}"
+                >
+                    Start Practice
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- ================= PERFORMANCE INSIGHTS ================= -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    AI-POWERED INSIGHTS
+                </p>
+
+                <h2>
+                    Performance Insights
+                </h2>
+
+                <p class="muted">
+                    Use your interview history to understand where
+                    you can improve.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="insights-grid">
+
+
+            <!-- Strongest Role -->
+
+            <article class="insight-card">
+
+                <h3>
+                    ⭐ Strongest Role
+                </h3>
+
+                {% if data.role_performance %}
+
+                    <p>
+                        {{ data.role_performance[0].job_role }}
+                    </p>
+
+                    <span class="muted">
+
+                        Average:
+                        {{ "%.2f"|format(data.role_performance[0].average_score|float) }}/10
+
+                    </span>
+
+                {% else %}
+
+                    <p>
+                        Not enough data yet.
+                    </p>
+
+                {% endif %}
+
+            </article>
+
+
+            <!-- Growth Area -->
+
+            <article class="insight-card">
+
+                <h3>
+                    📈 Growth Area
+                </h3>
+
+                {% if data.role_performance|length > 1 %}
+
+                    <p>
+                        {{ data.role_performance[-1].job_role }}
+                    </p>
+
+                    <span class="muted">
+
+                        Keep practicing this interview type.
+
+                    </span>
+
+                {% else %}
+
+                    <p>
+                        Complete more interviews to discover
+                        your growth areas.
+                    </p>
+
+                {% endif %}
+
+            </article>
+
+
+            <!-- Recommended Focus -->
+
+            <article class="insight-card">
+
+                <h3>
+                    🎯 Recommended Focus
+                </h3>
+
+                {% if data.statistics.average_score is not none
+                      and data.statistics.average_score|float < 5 %}
+
+                    <p>
+                        Focus on answering questions clearly and
+                        confidently.
+                    </p>
+
+                {% elif data.statistics.average_score is not none
+                      and data.statistics.average_score|float < 7 %}
+
+                    <p>
+                        Work on giving more structured and detailed
+                        answers.
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        Keep practicing advanced questions and
+                        communication skills.
+                    </p>
+
+                {% endif %}
+
+            </article>
+
+
+            <!-- Score Trend -->
+
+            <article class="insight-card">
+
+                <h3>
+                    📊 Score Trend
+                </h3>
+
+                {% if data.scores|length >= 2 %}
+
+                    {% if data.scores[-1] > data.scores[-2] %}
+
+                        <p>
+                            Your latest score improved.
+                        </p>
+
+                    {% elif data.scores[-1] < data.scores[-2] %}
+
+                        <p>
+                            Your latest score decreased.
+                            Keep practicing.
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            Your performance is stable.
+                        </p>
+
+                    {% endif %}
+
+                {% else %}
+
+                    <p>
+                        Complete another interview to see your
+                        performance trend.
+                    </p>
+
+                {% endif %}
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FINAL CALL TO ACTION ================= -->
+
+    <section class="glass-card">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    READY FOR YOUR NEXT STEP?
+                </p>
+
+                <h2>
+                    Practice. Improve. Get Hired.
+                </h2>
+
+                <p class="muted">
+                    Keep improving your interview performance and
+                    prepare yourself for real opportunities.
+                </p>
+
+            </div>
+
+
+            <div class="history-actions">
+
+                <a
+                    href="{{ url_for('trainer') }}"
+                    class="button"
+                >
+                    Start AI Practice
+                </a>
+
+                <a
+                    href="/scheduled-interviews"
+                    class="button-secondary"
+                >
+                    Schedule Interview
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+</body>
+
+</html>
