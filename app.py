@@ -364,7 +364,10 @@ def login():
     session["user_id"] = user["id"]
     session["user_name"] = user["name"]
     session["user_role"] = user["role"]
-    return redirect(url_for("trainer"))
+    if user["role"] == "admin":
+    return redirect(url_for("admin_dashboard"))
+
+return redirect(url_for("trainer"))
 
 
 @app.route("/logout", methods=["POST"])
