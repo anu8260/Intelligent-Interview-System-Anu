@@ -360,16 +360,17 @@ def login():
             "login.html", error="Invalid email or password.", message=None
         )
 
-    session.clear()
-    session["user_id"] = user["id"]
-    session["user_name"] = user["name"]
-    session["user_role"] = user["role"]
-    if user["role"] == "admin":
+session.clear()
+session["user_id"] = user["id"]
+session["user_name"] = user["name"]
+session["user_role"] = user["role"]
+
+print("LOGIN DEBUG:", user["email"], repr(user["role"]))
+
+if user["role"] == "admin":
     return redirect(url_for("admin_dashboard"))
 
 return redirect(url_for("trainer"))
-
-
 @app.route("/logout", methods=["POST"])
 def logout():
     clear_active_interview()
